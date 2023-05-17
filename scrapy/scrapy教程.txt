@@ -1,0 +1,59 @@
+1.  创建爬虫的项目   scrapy startproject 项目的名字
+
+                    注意: 项目的名字不允许使用数字开头   也不能包含中文
+
+2.  创建爬虫文件    
+                    a. 要在spiders文件夹中去创建爬虫文件
+
+                        cd 项目的名字\项目的名字\spiders
+                        cd scrapy_baidu\scrapy_baidu\spiders
+
+                    b. 创建爬虫文件
+
+                        scrapy genspider  爬虫文件的名字  要爬取网页
+                        ex. scrapy genspider baidu https://www.baidu.com
+                        一般情况下不需要添加http协议， 因为start_urls的值是根据allowed_domians修改的, 
+                        所以添加了https的话, 那么start_urls就需要我们手动去修改了
+
+3.  运行爬虫代码      
+                    scrapy crawl 爬虫的名字
+
+                    ex. scapy crawl baidu
+
+
+4.  项目组成
+                    spiders
+                        __init__.py
+                        自定义爬虫文件.py       由我们自己创建，实现爬虫核心功能的文件
+
+                    __init__.py
+                    items.py                   定义数据结构的地方, 爬取的数据都包含哪些，是一个继承自scrapy.Item的类
+                    middlewares.py             中间件  代理
+                    pipelines.py               管道文件，里面只有一个类，用于处理下载后数据的后续处理
+                                               默认是300优先级，值越小优先级越高 (1 - 1000)
+                    settings.py                配置文件   比如: 是否遵守robots 协议, User-Agent定义等
+
+
+5. response的属性和方法
+                            response.text                   获取的是响应的字符串
+                            response.body                   获取的是二进制数据
+                            response.status
+                            response.url
+
+                            response.xpath()                可以直接是xpath方法来解析response中的内容
+                            response.extract()              提取selector对象的data和属性值
+                            response.extract_first()        提取selector列表的第一个数据
+
+6. scrapy工作原理
+
+                            1. 引擎向spiders要url
+                            2. 引擎将要爬取的url给调度器
+                            3. 调度器会将url生成请求对象放入到指定的队列中
+                            4. 从队列中出队一个请求
+                            5. 引擎再讲请求交给下载器进行处理
+                            6. 下载器发送请求获取互联网数据
+                            7. 下载器将数据返回给引擎
+                            8. 引擎将数据再次送到spiders
+                            9. spiders通过xpath解析该数据，得到数据或者url
+                            10. spiders将数据或者url给到引擎
+                            11. 引擎判断该数据还是url, 数据交给管道( item pipeline) 处理，是url交给调度器处理
